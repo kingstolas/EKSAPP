@@ -14,18 +14,18 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Configuraciones de Apache
 RUN a2enmod rewrite
 
-# Instalar las dependencias del proyecto Laravel
-RUN composer install
-RUN composer update
-
 # Establecer el directorio de trabajo
-WORKDIR /var/www/html
+WORKDIR /var/www/html/backend
 
 # Copiar los archivos del backend
 COPY . .
 
 # Cambiar permisos a las carpetas necesarias
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Instalar las dependencias del proyecto Laravel
+RUN composer install
+RUN composer update
 
 # Configurar el puerto para Laravel
 EXPOSE 8000
