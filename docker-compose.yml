@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Servicio para el backend en Laravel
+  laravel:
+    build:
+      context: ./backend  # Ubicación del Dockerfile de Laravel
+    container_name: laravel-app
+    # environment:
+    #   - APP_ENV=local
+    #   - APP_DEBUG=true
+    #   - APP_KEY=base64:loJqhpxyXFUKLvdYxI8q9KpijLb9kH4epcL6MRT5Qwo=
+    #   - DB_CONNECTION=pgsql
+    #   - DB_HOST=postgres-db
+    #   - DB_PORT=5432
+    #   - DB_DATABASE=eks_notes
+    #   - DB_USERNAME=root
+    #   - DB_PASSWORD=root
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    # depends_on:
+    #   - postgres
+
+  # Servicio para el frontend en Nuxt
+  nuxt:
+    build:
+      context: ./frontend  # Ubicación del Dockerfile de Nuxt
+    container_name: nuxt-app
+    environment:
+      - NUXT_PUBLIC_API_BASE=http://localhost:8000/api  # API base del backend Laravel
+    volumes:
+      - ./frontend:/usr/src/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - laravel
+
+  # Servicio para PostgreSQL
+  postgres:
+    image: postgres:13
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: eks_notes
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+volumes:
+  postgres-data:

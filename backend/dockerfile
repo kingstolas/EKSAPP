@@ -1,0 +1,33 @@
+# Usamos la imagen oficial de PHP con Apache
+FROM php:8.2-apache
+
+# Instalar extensiones necesarias para Laravel
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    libzip-dev \
+    unzip \
+    && docker-php-ext-install pdo pdo_pgsql zip
+
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configuraciones de Apache
+RUN a2enmod rewrite
+
+# Establecer el directorio de trabajo
+WORKDIR /var/www/html
+
+# Copiar los archivos del backend
+COPY . .
+
+# Instalar las dependencias del proyecto Laravel
+RUN composer install --no-dev --optimize-autoloader
+
+# Cambiar permisos a las carpetas necesarias
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Configurar el puerto para Laravel
+EXPOSE 8000
+
+# Script de inicio para ejecutar migraciones y luego correr Laravel
+CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000
