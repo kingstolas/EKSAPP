@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Servicio para el backend en Laravel
   laravel:

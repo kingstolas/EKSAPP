@@ -21,7 +21,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Instalar las dependencias del proyecto Laravel
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install
 
 # Cambiar permisos a las carpetas necesarias
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
