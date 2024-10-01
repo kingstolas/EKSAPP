@@ -25,7 +25,7 @@ RUN composer install
 RUN composer update
 
 # Cambiar permisos a las carpetas necesarias
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/vendor/autoload.php
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Configurar el puerto para Laravel
 EXPOSE 8000
