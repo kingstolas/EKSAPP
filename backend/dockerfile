@@ -4,7 +4,7 @@ FROM php:8.2-cli
 # Establecemos el directorio de trabajo dentro del contenedor
 WORKDIR /var/www/html
 
-# Instalamos las extensiones necesarias de PHP para Laravel
+# Instalamos las extensiones necesarias de PHP para Laravel y PostgreSQL
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    git \
+    libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip bcmath
+    && docker-php-ext-install gd pdo pdo_pgsql zip bcmath
 
 # Instalamos Composer globalmente
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -30,7 +30,7 @@ RUN chown -R www-data:www-data /var/www/html \
 # Instalamos las dependencias de Laravel con Composer
 RUN composer install --no-dev --optimize-autoloader
 
-# Exponemos el puerto 8000
+# Exponemos el puerto 8000 para el servidor embebido de Laravel
 EXPOSE 8000
 
 # Comando por defecto para iniciar el servidor de Laravel
