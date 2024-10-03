@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eksapp-deployment
+  labels:
+    app: eksapp
+spec:
+  replicas: 2  # Número de réplicas de la aplicación
+  selector:
+    matchLabels:
+      app: eksapp
+  template:
+    metadata:
+      labels:
+        app: eksapp
+    spec:
+      containers:
+        - name: eksapp-laravel
+          image: 235963639292.dkr.ecr.us-east-1.amazonaws.com/eksapp-laravel:latest
+          ports:
+            - containerPort: 8000  # Cambia esto si tu aplicación Laravel usa un puerto diferente
+          env:
+            - name: DB_CONNECTION
+              value: "pgsql"  # Cambia esto según tu configuración
+            - name: DB_HOST
+              value: "postgres-db"  # Cambia esto según tu configuración
+            - name: DB_PORT
+              value: "5432"  # Cambia esto según tu configuración
+            - name: DB_DATABASE
+              value: "eks_notes"  # Cambia esto según tu configuración
+            - name: DB_USERNAME
+              value: "root"  # Cambia esto según tu configuración
+            - name: DB_PASSWORD
+              value: "root"  # Cambia esto según tu configuración
+        - name: eksapp-nuxt
+          image: 235963639292.dkr.ecr.us-east-1.amazonaws.com/eksapp-nuxt:latest
+          ports:
+            - containerPort: 3000  # Cambia esto si tu aplicación Nuxt usa un puerto diferente
+      restartPolicy: Always
