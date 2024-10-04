@@ -37,6 +37,120 @@
 #           ports:
 #             - containerPort: 3000  # Cambia esto si tu aplicación Nuxt usa un puerto diferente
 #       restartPolicy: Always
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: eksapp-deployment
+#   labels:
+#     app: eksapp
+# spec:
+#   replicas: 2  # Número de réplicas de la aplicación
+#   selector:
+#     matchLabels:
+#       app: eksapp
+#   template:
+#     metadata:
+#       labels:
+#         app: eksapp
+#     spec:
+#       containers:
+#         - name: eksapp-laravel
+#           image: 235963639292.dkr.ecr.us-east-1.amazonaws.com/eksapp-laravel:latest
+#           ports:
+#             - containerPort: 8000  # Puerto de Laravel
+#           env:
+#             - name: DB_CONNECTION
+#               value: "pgsql"
+#             - name: DB_HOST
+#               value: "postgres-service"  # Conexión al servicio PostgreSQL en Kubernetes
+#             - name: DB_PORT
+#               value: "5432"
+#             - name: DB_DATABASE
+#               value: "eks_notes"
+#             - name: DB_USERNAME
+#               value: "root"
+#             - name: DB_PASSWORD
+#               value: "root"
+#         - name: eksapp-nuxt
+#           image: 235963639292.dkr.ecr.us-east-1.amazonaws.com/eksapp-nuxt:latest
+#           ports:
+#             - containerPort: 3000  # Puerto de Nuxt
+#       restartPolicy: Always
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: postgres-deployment
+#   labels:
+#     app: postgres
+# spec:
+#   replicas: 1  # Sólo necesitas una réplica de PostgreSQL
+#   selector:
+#     matchLabels:
+#       app: postgres
+#   template:
+#     metadata:
+#       labels:
+#         app: postgres
+#     spec:
+#       containers:
+#         - name: postgres
+#           image: postgres:13
+#           ports:
+#             - containerPort: 5432
+#           env:
+#             - name: POSTGRES_DB
+#               value: "eks_notes"
+#             - name: POSTGRES_USER
+#               value: "root"
+#             - name: POSTGRES_PASSWORD
+#               value: "root"
+#           volumeMounts:
+#             - mountPath: /var/lib/postgresql/data
+#               name: postgres-storage
+#       volumes:
+#         - name: postgres-storage
+#           persistentVolumeClaim:
+#             claimName: postgres-pvc
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: eksapp-service
+# spec:
+#   selector:
+#     app: eksapp
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 3000  # Apunta al puerto de Nuxt
+#   type: LoadBalancer
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: postgres-service
+# spec:
+#   selector:
+#     app: postgres
+#   ports:
+#     - protocol: TCP
+#       port: 5432
+#       targetPort: 5432
+#   type: ClusterIP
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: postgres-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -149,3 +263,4 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
